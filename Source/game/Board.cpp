@@ -110,6 +110,18 @@ State Board::getCellState(int x, int y)
     return cells[x][y].getState();
 }
 
+void Board::changeState(int x, int y)
+{
+    if (cells[x][y].getState() == State::Alive)
+    {
+        cells[x][y].setState(State::Dead);
+    }
+    else
+    {
+        cells[x][y].setState(State::Alive);
+    }
+}
+
 int Board::getNumberOfNeighbours(int x, int y)
 {
     int numNeighbours = 0;

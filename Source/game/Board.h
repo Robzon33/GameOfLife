@@ -24,6 +24,7 @@ public:
     void doNextStep();
     int getSize();
     State getCellState(int x, int y);
+    void changeState(int x, int y);
     void clear();
 private:
     int getNumberOfNeighbours(int x, int y);

@@ -76,3 +76,24 @@ void GameComponent::resized()
     // components that your component contains..
 
 }
+
+void GameComponent::mouseDown(const juce::MouseEvent& event)
+{
+    // Get the size of the board
+    int boardSize = gameOfLife.getSize();
+
+    // Calculate the size of each cell
+    int cellSize = std::min(getWidth() / boardSize, getHeight() / boardSize);
+
+    // Calculate the cell position based on the mouse click position
+    int cellX = event.x / cellSize;
+    int cellY = event.y / cellSize;
+
+    // Ensure the calculated cell position is within the bounds of the board
+    if (cellX >= 0 && cellX < boardSize && cellY >= 0 && cellY < boardSize)
+    {
+        gameOfLife.changeState(cellX, cellY);
+        
+        repaint(); // Repaint the component to update the display
+    }
+}

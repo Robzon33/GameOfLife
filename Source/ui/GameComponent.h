@@ -24,7 +24,8 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
-
+    
+    void mouseDown(const juce::MouseEvent& event) override;
 private:
     Board& gameOfLife;
     
