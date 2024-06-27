@@ -4,6 +4,15 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="whKrwu" name="GameOfLife">
     <GROUP id="{74480071-A2D1-93F8-9D6C-FE76E36A495C}" name="Source">
+      <GROUP id="{6E7DCD9D-F079-49E2-B993-6966781BAD34}" name="resources">
+        <FILE id="zvjP4B" name="cello.wav" compile="0" resource="1" file="Source/resources/cello.wav"/>
+      </GROUP>
+      <GROUP id="{D582A9A7-88A0-37B4-A054-126033099876}" name="synths">
+        <GROUP id="{E8CC9C0E-AFED-3A7C-EB01-26890C2E80DE}" name="sampleSynth">
+          <FILE id="GSGh6R" name="SampleSound.h" compile="0" resource="0" file="Source/synths/SampleSynth/SampleSound.h"/>
+          <FILE id="sUhtB2" name="SampleVoice.h" compile="0" resource="0" file="Source/synths/SampleSynth/SampleVoice.h"/>
+        </GROUP>
+      </GROUP>
       <GROUP id="{715CD5C7-D0FC-9E47-E2D4-DED1631795D2}" name="game">
         <FILE id="EhpGrD" name="Board.cpp" compile="1" resource="0" file="Source/game/Board.cpp"/>
         <FILE id="ETITvA" name="Board.h" compile="0" resource="0" file="Source/game/Board.h"/>

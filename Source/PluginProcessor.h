@@ -54,8 +54,11 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    bool flag = false;
 private:
     Board gameOfLife;
+    juce::Synthesiser synth;
+    juce::SamplerSound::Ptr sampleSound;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GameOfLifeAudioProcessor)

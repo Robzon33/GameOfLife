@@ -50,5 +50,6 @@ void GameOfLifeAudioProcessorEditor::buttonClicked(juce::Button* button)
     {
         gameOfLife.doNextStep(); // Call the method to perform the next step
         repaint(); // Update the display after the step
+        audioProcessor.flag = true;
     }
 }
