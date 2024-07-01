@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "game/Board.h"
+#include "synths/SampleSynth/SampleSynth.h"
 
 //==============================================================================
 /**
@@ -57,8 +58,7 @@ public:
     bool flag = false;
 private:
     Board gameOfLife;
-    juce::Synthesiser synth;
-    juce::SamplerSound::Ptr sampleSound;
+    SampleSynth synth;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GameOfLifeAudioProcessor)

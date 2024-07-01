@@ -10,6 +10,7 @@
       <GROUP id="{D582A9A7-88A0-37B4-A054-126033099876}" name="synths">
         <GROUP id="{E8CC9C0E-AFED-3A7C-EB01-26890C2E80DE}" name="sampleSynth">
           <FILE id="GSGh6R" name="SampleSound.h" compile="0" resource="0" file="Source/synths/SampleSynth/SampleSound.h"/>
+          <FILE id="Sr08dQ" name="SampleSynth.h" compile="0" resource="0" file="Source/synths/SampleSynth/SampleSynth.h"/>
           <FILE id="sUhtB2" name="SampleVoice.h" compile="0" resource="0" file="Source/synths/SampleSynth/SampleVoice.h"/>
         </GROUP>
       </GROUP>
