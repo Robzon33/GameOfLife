@@ -27,9 +27,10 @@ public:
         formatManager.registerBasicFormats();
 
         // Use BinaryData to get the WAV file
-        std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(
-                std::make_unique<juce::MemoryInputStream>(BinaryData::cello_wav, BinaryData::cello_wavSize, false)
-        ));
+        auto waveFile = BinaryData::cello_wav;
+        auto waveFileSize = BinaryData::cello_wavSize;
+        
+        std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(std::make_unique<juce::MemoryInputStream>(waveFile, waveFileSize, false)));
         
         if (reader != nullptr)
         {
