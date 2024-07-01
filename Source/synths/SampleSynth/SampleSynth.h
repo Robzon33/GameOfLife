@@ -44,9 +44,32 @@ public:
             this->addSound(sampleSound);
             //delete reader;
         }
+        
+        this->createRhythmArray();
     };
     
     ~SampleSynth() {};
+    
+    bool playAt16thNote(int current16thNote)
+    {
+        if (0 <= current16thNote < 16)
+        {
+            return rhythmArray[current16thNote];
+        }
+        
+        return false;
+    };
 private:
+    void createRhythmArray()
+    {
+        rhythmArray.fill(false);
+        
+        rhythmArray[0] = true;
+        rhythmArray[4] = true;
+        rhythmArray[8] = true;
+        rhythmArray[12] = true;
+    };
+    
     juce::SamplerSound::Ptr sampleSound;
+    std::array<bool, 16> rhythmArray;
 };

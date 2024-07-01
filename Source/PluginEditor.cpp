@@ -22,6 +22,8 @@ GameOfLifeAudioProcessorEditor::GameOfLifeAudioProcessorEditor (GameOfLifeAudioP
     addAndMakeVisible(nextStepButton);
     nextStepButton.setButtonText("Next Step");
     nextStepButton.addListener(this);
+    
+    gameOfLife.addChangeListener(this);
 }
 
 GameOfLifeAudioProcessorEditor::~GameOfLifeAudioProcessorEditor()
@@ -52,4 +54,9 @@ void GameOfLifeAudioProcessorEditor::buttonClicked(juce::Button* button)
         repaint(); // Update the display after the step
         audioProcessor.flag = true;
     }
+}
+
+void GameOfLifeAudioProcessorEditor::changeListenerCallback(juce::ChangeBroadcaster *source)
+{
+    this->repaint();
 }

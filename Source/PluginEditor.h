@@ -17,7 +17,8 @@
 /**
 */
 class GameOfLifeAudioProcessorEditor  : public juce::AudioProcessorEditor,
-                                        public juce::Button::Listener
+                                        public juce::Button::Listener,
+                                        public juce::ChangeListener
 {
 public:
     GameOfLifeAudioProcessorEditor (GameOfLifeAudioProcessor&, Board&);
@@ -28,6 +29,8 @@ public:
     void resized() override;
     
     void buttonClicked(juce::Button* button) override;
+    
+    void changeListenerCallback(juce::ChangeBroadcaster *source) override;
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.

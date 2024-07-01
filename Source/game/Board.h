@@ -14,7 +14,7 @@
 #include "Cell.h"
 #include "Settings.h"
 
-class Board
+class Board : public juce::ChangeBroadcaster
 {
 public:
     Board(int size);

@@ -24,10 +24,12 @@ GameOfLifeAudioProcessor::GameOfLifeAudioProcessor()
 #endif
     gameOfLife(20)
 {
+    current16thNote = 0;
 }
 
 GameOfLifeAudioProcessor::~GameOfLifeAudioProcessor()
 {
+    this->bpm = 50;
 }
 
 //==============================================================================
@@ -95,10 +97,52 @@ void GameOfLifeAudioProcessor::changeProgramName (int index, const juce::String&
 //==============================================================================
 void GameOfLifeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-    
     synth.setCurrentPlaybackSampleRate(sampleRate);
+    
+    // set up bpm
+    bpm = 50;
+    
+    // If there's a playhead and it has a tempo, use it
+    if (auto* playHead = getPlayHead())
+    {
+        auto position = playHead->getPosition();
+        if (position)
+        {
+            bpm = static_cast<int>(*position->getBpm());
+        }
+    }
+
+    // Log or print the BPM to ensure it's being set correctly
+    DBG("BPM set to: " << bpm);
+    
+    // Calculate timer interval based on BPM
+    double secondsPerBeat = 60.0 / bpm;
+    double secondsPer16thNote = secondsPerBeat / 4.0;
+            
+    // Convert seconds to milliseconds for Timer
+    int timerInterval = static_cast<int>(secondsPer16thNote * 1000.0);
+
+    startTimer(timerInterval);  // Start the timer with calculated interval
+    
+    //    // Playhead stuff
+    //    auto playhead = getPlayHead();
+    //    if (playhead != nullptr)
+    //    {
+    //        auto position = playhead->getPosition();
+    //        if(position)
+    //        {
+    //            auto bpm = position->getBpm();
+    //            auto barCount = position->getBarCount();
+    //            auto isPlaying = position->getIsPlaying();
+    //            auto isLoop = position->getIsLooping();
+    //            auto ppq = position->getPpqPosition();
+    //            if (ppq)
+    //            {
+    //                // Dont do this on audio thread!!!
+    //                DBG ("PPQ: " << *ppq);
+    //            }
+    //        }
+    //    }
 }
 
 void GameOfLifeAudioProcessor::releaseResources()
@@ -150,16 +194,17 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
     if (flag)
     {
-        // Generate a MIDI note-on message (middle C, velocity 0.7)
+        if (synth.playAt16thNote(current16thNote))
+        {
+            // Generate a MIDI note-on message (middle C, velocity 0.7)
             juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
 
             // Insert the MIDI messages into the midiMessages buffer
             midiMessages.addEvent(noteOn, 0);
+        }
         
         flag = false;
     }
- 
-    
     
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
     
@@ -176,25 +221,7 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         // ..do something to the data...
     //}
     
-//    // Playhead stuff
-//    auto playhead = getPlayHead();
-//    if (playhead != nullptr)
-//    {
-//        auto position = playhead->getPosition();
-//        if(position)
-//        {
-//            auto bpm = position->getBpm();
-//            auto barCount = position->getBarCount();
-//            auto isPlaying = position->getIsPlaying();
-//            auto isLoop = position->getIsLooping();
-//            auto ppq = position->getPpqPosition();
-//            if (ppq)
-//            {
-//                // Dont do this on audio thread!!!
-//                DBG ("PPQ: " << *ppq);
-//            }
-//        }
-//    }
+
 }
 
 //==============================================================================
@@ -220,6 +247,21 @@ void GameOfLifeAudioProcessor::setStateInformation (const void* data, int sizeIn
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+void GameOfLifeAudioProcessor::timerCallback()
+{
+    current16thNote = current16thNote + 1;
+    
+    if (current16thNote == 16)
+        current16thNote = 0;
+    
+    flag = true;
+    
+    if (current16thNote == 0)
+    {
+        gameOfLife.doNextStep();
+    }
 }
 
 //==============================================================================

@@ -98,6 +98,8 @@ void Board::doNextStep()
             cells[x][y].setState(nextState[x][y]);
         }
     }
+    
+    this->sendChangeMessage();
 }
 
 int Board::getSize()
