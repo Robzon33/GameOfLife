@@ -27,8 +27,8 @@ public:
         formatManager.registerBasicFormats();
 
         // Use BinaryData to get the WAV file
-        auto waveFile = BinaryData::cello_wav;
-        auto waveFileSize = BinaryData::cello_wavSize;
+        auto waveFile = BinaryData::kick_wav;
+        auto waveFileSize = BinaryData::kick_wavSize;
         
         std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(std::make_unique<juce::MemoryInputStream>(waveFile, waveFileSize, false)));
         
@@ -41,7 +41,7 @@ public:
             juce::BigInteger allNotes;
             allNotes.setRange(0, 128, true);
 
-            sampleSound = new juce::SamplerSound("Cello", *reader, allNotes, 60, 0.1, 0.1, 10.0);
+            sampleSound = new juce::SamplerSound("Kick", *reader, allNotes, 60, 0.1, 0.1, 10.0);
             this->addSound(sampleSound);
             //delete reader;
         }

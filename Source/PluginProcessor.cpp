@@ -179,21 +179,21 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    if (flag)
-    {
-        if (synth.playAt16thNote(current16thNote))
-        {
-            // Generate a MIDI note-on message (middle C, velocity 0.7)
-            juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
-
-            // Insert the MIDI messages into the midiMessages buffer
-            midiMessages.addEvent(noteOn, 0);
-        }
-        
-        flag = false;
-    }
-    
-    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+//    if (flag)
+//    {
+//        if (synth.playAt16thNote(current16thNote))
+//        {
+//            // Generate a MIDI note-on message (middle C, velocity 0.7)
+//            juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
+//
+//            // Insert the MIDI messages into the midiMessages buffer
+//            midiMessages.addEvent(noteOn, 0);
+//        }
+//
+//        flag = false;
+//    }
+//
+//    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
     
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
@@ -208,8 +208,7 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         // ..do something to the data...
     //}
     
-    // clear midi messages just in case there is something in there
-    midiMessages.clear();
+    
     
 
     if (auto* playHead = getPlayHead())
@@ -231,17 +230,36 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
                     int beatsPerBar = timeSignature->numerator;
                     
                     // the tolerance needs to be implemented because getPpqPosition doesn't
-                    // always return an integer
+                    // always return an integer. Not sure if this is value is a good choice.
                     const double tolerance = 0.04;//1e-1;
                     
+                    // at the beginning of every bar set the flag
                     if (fmod (currentPpq, beatsPerBar) < tolerance)
                     {
                         this->_firstBeatOfBarFlag = true;
+                    }
+                    
+                    // add midi messages on every 16th note
+                    double intPart;
+                    double fracPart = modf(currentPpq, &intPart);
+                    if (std::abs(fracPart - 0) < tolerance) //||
+                        //std::abs(fracPart - 0.5) < tolerance)
+                    {
+                        // Generate a MIDI note-on message (middle C, velocity 0.7)
+                        juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
+                        
+                        // Insert the MIDI messages into the midiMessages buffer
+                        midiMessages.addEvent(noteOn, 0);
                     }
                 }
             }
         }
     }
+    
+    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    
+    // clear midi messages just in case there is something in there
+    midiMessages.clear();
 }
 
 //==============================================================================
