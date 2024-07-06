@@ -28,6 +28,7 @@ GameOfLifeAudioProcessorEditor::GameOfLifeAudioProcessorEditor (GameOfLifeAudioP
 
 GameOfLifeAudioProcessorEditor::~GameOfLifeAudioProcessorEditor()
 {
+    gameOfLife.removeChangeListener(this);
 }
 
 //==============================================================================

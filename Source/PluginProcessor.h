@@ -58,10 +58,16 @@ public:
     void timerCallback() override;
     int current16thNote;
     bool flag = false;
+    bool getBpmFromDawFlag = false;
 private:
     Board gameOfLife;
     SampleSynth synth;
     int bpm;
+    
+    juce::Atomic<int> _bpm;
+    bool _firstBeatOfBarFlag;
+    
+    void setTimerIntervall();
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GameOfLifeAudioProcessor)

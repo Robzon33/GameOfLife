@@ -25,11 +25,14 @@ GameOfLifeAudioProcessor::GameOfLifeAudioProcessor()
     gameOfLife(20)
 {
     current16thNote = 0;
+    this->bpm = 50;
+    this->_bpm = 80;
+    this->setTimerIntervall();
 }
 
 GameOfLifeAudioProcessor::~GameOfLifeAudioProcessor()
 {
-    this->bpm = 50;
+    this->stopTimer();
 }
 
 //==============================================================================
@@ -98,22 +101,6 @@ void GameOfLifeAudioProcessor::changeProgramName (int index, const juce::String&
 void GameOfLifeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     synth.setCurrentPlaybackSampleRate(sampleRate);
-    
-    // set up bpm
-    bpm = 50;
-    
-    // If there's a playhead and it has a tempo, use it
-    if (auto* playHead = getPlayHead())
-    {
-        auto position = playHead->getPosition();
-        if (position)
-        {
-            bpm = static_cast<int>(*position->getBpm());
-        }
-    }
-
-    // Log or print the BPM to ensure it's being set correctly
-    DBG("BPM set to: " << bpm);
     
     // Calculate timer interval based on BPM
     double secondsPerBeat = 60.0 / bpm;
@@ -221,7 +208,40 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         // ..do something to the data...
     //}
     
+    // clear midi messages just in case there is something in there
+    midiMessages.clear();
+    
 
+    if (auto* playHead = getPlayHead())
+    {
+        auto position = playHead->getPosition();
+        if (position)
+        {
+            if (position->getBpm().hasValue())
+            {
+                _bpm = static_cast<int>(*position->getBpm());
+            }
+            if (position->getIsPlaying())
+            {
+                if (position->getPpqPosition().hasValue())
+                {
+                    double currentPpq = static_cast<double>(*position->getPpqPosition());
+                    
+                    auto timeSignature = position->getTimeSignature();
+                    int beatsPerBar = timeSignature->numerator;
+                    
+                    // the tolerance needs to be implemented because getPpqPosition doesn't
+                    // always return an integer
+                    const double tolerance = 0.04;//1e-1;
+                    
+                    if (fmod (currentPpq, beatsPerBar) < tolerance)
+                    {
+                        this->_firstBeatOfBarFlag = true;
+                    }
+                }
+            }
+        }
+    }
 }
 
 //==============================================================================
@@ -251,17 +271,39 @@ void GameOfLifeAudioProcessor::setStateInformation (const void* data, int sizeIn
 
 void GameOfLifeAudioProcessor::timerCallback()
 {
-    current16thNote = current16thNote + 1;
+//    current16thNote = current16thNote + 1;
+//
+//    if (current16thNote == 16)
+//        current16thNote = 0;
+//
+//    flag = true;
+//
+//    if (current16thNote == 0)
+//    {
+//        gameOfLife.doNextStep();
+//        getBpmFromDawFlag = true;
+//        setTimerIntervall();
+//    }
     
-    if (current16thNote == 16)
-        current16thNote = 0;
+    DBG("BPM set to: " << _bpm.get());
     
-    flag = true;
-    
-    if (current16thNote == 0)
+    if (_firstBeatOfBarFlag)
     {
         gameOfLife.doNextStep();
+        _firstBeatOfBarFlag = false;
     }
+}
+
+void GameOfLifeAudioProcessor::setTimerIntervall()
+{
+    // Calculate timer interval based on BPM
+    double secondsPerBeat = 60.0 / bpm;
+    double secondsPer16thNote = secondsPerBeat / 4.0;
+            
+    // Convert seconds to milliseconds for Timer
+    int timerInterval = static_cast<int>(secondsPer16thNote * 1000.0);
+    
+    startTimer(timerInterval);
 }
 
 //==============================================================================
