@@ -14,10 +14,12 @@
 #include "SampleSound.h"
 #include "SampleVoice.h"
 
+enum class SampleType { Kick, ClosedHH};
+
 class SampleSynth : public juce::Synthesiser
 {
 public:
-    SampleSynth()
+    SampleSynth(SampleType sampleType)
     {
         this->clearVoices();
         for (int i = 0; i < 4; ++i)
@@ -25,10 +27,23 @@ public:
 
         juce::AudioFormatManager formatManager;
         formatManager.registerBasicFormats();
-
+        
+        const void* waveFile = nullptr;
+        size_t waveFileSize = 0;
+        
         // Use BinaryData to get the WAV file
-        auto waveFile = BinaryData::kick_wav;
-        auto waveFileSize = BinaryData::kick_wavSize;
+        if (sampleType == SampleType::Kick)
+        {
+            waveFile = BinaryData::kick_wav;
+            waveFileSize = BinaryData::kick_wavSize;
+            this->createRhythmArray();
+        }
+        else if (sampleType == SampleType::ClosedHH)
+        {
+            waveFile = BinaryData::closedhh_wav;
+            waveFileSize = BinaryData::closedhh_wavSize;
+            this->createRhythmArray2();
+        }
         
         std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(std::make_unique<juce::MemoryInputStream>(waveFile, waveFileSize, false)));
         
@@ -46,7 +61,7 @@ public:
             //delete reader;
         }
         
-        this->createRhythmArray();
+        
     };
     
     ~SampleSynth() {};
@@ -69,6 +84,16 @@ private:
         rhythmArray[4] = true;
         rhythmArray[8] = true;
         rhythmArray[12] = true;
+    };
+    
+    void createRhythmArray2()
+    {
+        rhythmArray.fill(false);
+        
+        rhythmArray[2] = true;
+        rhythmArray[6] = true;
+        rhythmArray[10] = true;
+        rhythmArray[14] = true;
     };
     
     juce::SamplerSound::Ptr sampleSound;

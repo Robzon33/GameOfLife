@@ -16,7 +16,7 @@
 //==============================================================================
 /**
 */
-class GameOfLifeAudioProcessor  : public juce::AudioProcessor, public juce::Timer
+class GameOfLifeAudioProcessor  : public juce::AudioProcessor, juce::Timer
 {
 public:
     //==============================================================================
@@ -57,18 +57,17 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     void timerCallback() override;
-    int current16thNote;
-    bool flag = false;
-    bool getBpmFromDawFlag = false;
+    bool flag; // to do next step and update gui
 private:
     Board gameOfLife;
     SampleSynth kickSynth;
-    int bpm;
+    SampleSynth hhSynth;
     
     juce::Atomic<int> _bpm;
-    bool _firstBeatOfBarFlag;
-    juce::Atomic<int> _current16thNote; // value between 0 and 15 (for one bar)
-    juce::Atomic<bool> _next16thNote;
+    juce::Atomic<double> _ppq;
+    juce::Atomic<int> _current16thStep; // value between 0 and 15 (for one bar in 4 4 time)
+    const int stepsPerBeat = 4;
+    const int numSteps = 16;
     
     MidiMapper midiMapper;
     

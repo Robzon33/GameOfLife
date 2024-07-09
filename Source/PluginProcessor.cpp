@@ -22,17 +22,15 @@ GameOfLifeAudioProcessor::GameOfLifeAudioProcessor()
                      #endif
                        ),
 #endif
-    gameOfLife(20), midiMapper(gameOfLife)
+    gameOfLife(20), midiMapper(gameOfLife), kickSynth(SampleType::Kick), hhSynth(SampleType::ClosedHH)
 {
-    current16thNote = 0;
-    this->bpm = 50;
-    this->_bpm = 80;
-    this->startTimer(10);
+    _current16thStep = 0;
+    _bpm = 120;
+    startTimer(200);
 }
 
 GameOfLifeAudioProcessor::~GameOfLifeAudioProcessor()
 {
-    this->stopTimer();
 }
 
 //==============================================================================
@@ -101,35 +99,7 @@ void GameOfLifeAudioProcessor::changeProgramName (int index, const juce::String&
 void GameOfLifeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     kickSynth.setCurrentPlaybackSampleRate(sampleRate);
-    
-    // Calculate timer interval based on BPM
-    double secondsPerBeat = 60.0 / bpm;
-    double secondsPer16thNote = secondsPerBeat / 4.0;
-            
-    // Convert seconds to milliseconds for Timer
-    int timerInterval = static_cast<int>(secondsPer16thNote * 1000.0);
-
-    startTimer(timerInterval);  // Start the timer with calculated interval
-    
-    //    // Playhead stuff
-    //    auto playhead = getPlayHead();
-    //    if (playhead != nullptr)
-    //    {
-    //        auto position = playhead->getPosition();
-    //        if(position)
-    //        {
-    //            auto bpm = position->getBpm();
-    //            auto barCount = position->getBarCount();
-    //            auto isPlaying = position->getIsPlaying();
-    //            auto isLoop = position->getIsLooping();
-    //            auto ppq = position->getPpqPosition();
-    //            if (ppq)
-    //            {
-    //                // Dont do this on audio thread!!!
-    //                DBG ("PPQ: " << *ppq);
-    //            }
-    //        }
-    //    }
+    hhSynth.setCurrentPlaybackSampleRate(sampleRate);
 }
 
 void GameOfLifeAudioProcessor::releaseResources()
@@ -195,34 +165,34 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 //
 //    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
     
-    if(flag)
-    {
-        juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
-        midiMessages.addEvent(noteOn, 0);
-        
-        midiMapper.addMidiMessagesToBuffer(midiMessages);
-        
-        flag = false;
-    }
-    
-    juce::MidiBuffer filteredMidiMessagesChannel1;
-    juce::MidiBuffer filteredMidiMessagesChannel2;
-
-    // Iterate through the MIDI messages
-    for (const auto metadata : midiMessages)
-    {
-        auto message = metadata.getMessage();
-        if (message.getChannel() == 1)
-        {
-            filteredMidiMessagesChannel1.addEvent(message, metadata.samplePosition);
-        }
-        if (message.getChannel() == 2)
-        {
-            filteredMidiMessagesChannel2.addEvent(message, metadata.samplePosition);
-        }
-    }
-    
-    kickSynth.renderNextBlock(buffer, filteredMidiMessagesChannel1, 0, buffer.getNumSamples());
+//    if(flag)
+//    {
+//        //juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
+//        //midiMessages.addEvent(noteOn, 0);
+//
+//        midiMapper.addMidiMessagesToBuffer(midiMessages);
+//
+//        flag = false;
+//    }
+//
+//    juce::MidiBuffer filteredMidiMessagesChannel1;
+//    juce::MidiBuffer filteredMidiMessagesChannel2;
+//
+//    // Iterate through the MIDI messages
+//    for (const auto metadata : midiMessages)
+//    {
+//        auto message = metadata.getMessage();
+//        if (message.getChannel() == 1)
+//        {
+//            filteredMidiMessagesChannel1.addEvent(message, metadata.samplePosition);
+//        }
+//        if (message.getChannel() == 2)
+//        {
+//            filteredMidiMessagesChannel2.addEvent(message, metadata.samplePosition);
+//        }
+//    }
+//
+//    kickSynth.renderNextBlock(buffer, filteredMidiMessagesChannel1, 0, buffer.getNumSamples());
     
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
@@ -237,9 +207,9 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         // ..do something to the data...
     //}
     
+    juce::MidiBuffer kickMidiMessages;
+    juce::MidiBuffer hhMidiMessages;
     
-    
-
     if (auto* playHead = getPlayHead())
     {
         auto position = playHead->getPosition();
@@ -253,55 +223,49 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
             {
                 if (position->getPpqPosition().hasValue())
                 {
-                    double currentPpq = static_cast<double>(*position->getPpqPosition());
+                    _ppq = static_cast<double>(*position->getPpqPosition());
                     
-                    auto timeSignature = position->getTimeSignature();
-                    int beatsPerBar = timeSignature->numerator;
+                    const double quarterNoteDuration = 60.0 / _bpm.get();
+                    const double samplesPerQuarterNote = getSampleRate() * quarterNoteDuration;
                     
-                    // the tolerance needs to be implemented because getPpqPosition doesn't
-                    // always return an integer. Not sure if this is value is a good choice.
-                    const double tolerance = 1e-2;
+                    const double samplesPerStep = samplesPerQuarterNote / stepsPerBeat;
                     
-                    // at the beginning of every bar set the flag
-                    if (fmod (currentPpq, beatsPerBar) < tolerance)
+                    int last16thStep = _current16thStep.get();
+                    _current16thStep = static_cast<int>(_ppq.get() * stepsPerBeat) % numSteps;
+                    
+                    if (_current16thStep.get() == 0 && _current16thStep.get() != last16thStep)
                     {
-                        this->_firstBeatOfBarFlag = true;
+                        flag = true;
                     }
                     
-//                    if (fmod (currentPpq, 0.25) < tolerance)
-//                    {
-//                        this->_next16thNote = true;
-//                    }
+                    const int samplePositionInStep = static_cast<int>((_ppq.get() * stepsPerBeat) * samplesPerStep) % static_cast<int>(samplesPerStep);
                     
-                    // add midi messages on every 16th note
-//                    double intPart;
-//                    double fracPart = modf(currentPpq, &intPart);
-//                    if (std::abs(fracPart - 0) < tolerance ||
-//                        std::abs(fracPart - 0.5) < tolerance ||
-//                        std::abs(fracPart - 0.25) < tolerance ||
-//                        std::abs(fracPart - 0.75) < tolerance)
-//                    {
-//                        // Generate a MIDI note-on message (middle C, velocity 0.7)
-//                        //juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
-//
-//                        // Insert the MIDI messages into the midiMessages buffer
-//                        //midiMessages.addEvent(noteOn, 0);
-//                        //this->_current16thNote.get() = this->_current16thNote.get() + 1;
-//                        _current16thNote.operator++();
-//
-//                        if (_current16thNote.get()  == 16)
-//                        {
-//                            this->_current16thNote = 0;
-//                        }
-//                    }
+                    // We process each sample in the block to check if a note should be triggered
+                    for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
+                    {
+                        if (sample == samplePositionInStep)
+                        {
+                            // Send note-on message
+                            juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, (juce::uint8)127);
+                            noteOn.setTimeStamp(sample);
+                            
+                            if (kickSynth.playAt16thNote(_current16thStep.get()))
+                            {
+                                kickMidiMessages.addEvent(noteOn, sample);
+                            }
+                            if (hhSynth.playAt16thNote(_current16thStep.get()))
+                            {
+                                hhMidiMessages.addEvent(noteOn, sample);
+                            }
+                        }
+                    }
                 }
             }
         }
     }
     
-    
-    
-    
+    kickSynth.renderNextBlock(buffer, kickMidiMessages, 0, buffer.getNumSamples());
+    hhSynth.renderNextBlock(buffer, hhMidiMessages, 0, buffer.getNumSamples());
     
     // clear midi messages just in case there is something in there
     midiMessages.clear();
@@ -334,43 +298,10 @@ void GameOfLifeAudioProcessor::setStateInformation (const void* data, int sizeIn
 
 void GameOfLifeAudioProcessor::timerCallback()
 {
-//    current16thNote = current16thNote + 1;
-//
-//    if (current16thNote == 16)
-//        current16thNote = 0;
-//
-//    flag = true;
-//
-//    if (current16thNote == 0)
-//    {
-//        gameOfLife.doNextStep();
-//        getBpmFromDawFlag = true;
-//        setTimerIntervall();
-//    }
-    
-    //DBG("BPM set to: " << _bpm.get());
-    
-//    if (_next16thNote.get())
-//    {
-//        _current16thNote.operator++();
-//
-//        if (_current16thNote.get() == 16)
-//        {
-//            _current16thNote = 0;
-//        }
-//
-//        flag = true;
-//    }
-    
-    
-    
-    //DBG("Current 16th note: " << _current16thNote.get());
-    
-    if (_firstBeatOfBarFlag)
+    if (flag)
     {
         gameOfLife.doNextStep();
-        _firstBeatOfBarFlag = false;
-        flag = true;
+        flag = false;
     }
 }
 
