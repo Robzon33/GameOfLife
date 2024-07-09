@@ -22,12 +22,12 @@ GameOfLifeAudioProcessor::GameOfLifeAudioProcessor()
                      #endif
                        ),
 #endif
-    gameOfLife(20)
+    gameOfLife(20), midiMapper(gameOfLife)
 {
     current16thNote = 0;
     this->bpm = 50;
     this->_bpm = 80;
-    this->setTimerIntervall();
+    this->startTimer(10);
 }
 
 GameOfLifeAudioProcessor::~GameOfLifeAudioProcessor()
@@ -195,6 +195,17 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 //
 //    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
     
+    if(flag)
+    {
+            juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
+            midiMessages.addEvent(noteOn, 0);
+        
+        
+        flag = false;
+    }
+    
+    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     // Make sure to reset the state if your inner loop is processing
@@ -231,7 +242,7 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
                     
                     // the tolerance needs to be implemented because getPpqPosition doesn't
                     // always return an integer. Not sure if this is value is a good choice.
-                    const double tolerance = 0.04;//1e-1;
+                    const double tolerance = 1e-2;
                     
                     // at the beginning of every bar set the flag
                     if (fmod (currentPpq, beatsPerBar) < tolerance)
@@ -239,24 +250,40 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
                         this->_firstBeatOfBarFlag = true;
                     }
                     
+//                    if (fmod (currentPpq, 0.25) < tolerance)
+//                    {
+//                        this->_next16thNote = true;
+//                    }
+                    
                     // add midi messages on every 16th note
-                    double intPart;
-                    double fracPart = modf(currentPpq, &intPart);
-                    if (std::abs(fracPart - 0) < tolerance) //||
-                        //std::abs(fracPart - 0.5) < tolerance)
-                    {
-                        // Generate a MIDI note-on message (middle C, velocity 0.7)
-                        juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
-                        
-                        // Insert the MIDI messages into the midiMessages buffer
-                        midiMessages.addEvent(noteOn, 0);
-                    }
+//                    double intPart;
+//                    double fracPart = modf(currentPpq, &intPart);
+//                    if (std::abs(fracPart - 0) < tolerance ||
+//                        std::abs(fracPart - 0.5) < tolerance ||
+//                        std::abs(fracPart - 0.25) < tolerance ||
+//                        std::abs(fracPart - 0.75) < tolerance)
+//                    {
+//                        // Generate a MIDI note-on message (middle C, velocity 0.7)
+//                        //juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
+//
+//                        // Insert the MIDI messages into the midiMessages buffer
+//                        //midiMessages.addEvent(noteOn, 0);
+//                        //this->_current16thNote.get() = this->_current16thNote.get() + 1;
+//                        _current16thNote.operator++();
+//
+//                        if (_current16thNote.get()  == 16)
+//                        {
+//                            this->_current16thNote = 0;
+//                        }
+//                    }
                 }
             }
         }
     }
     
-    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    
+    
+    
     
     // clear midi messages just in case there is something in there
     midiMessages.clear();
@@ -303,25 +330,30 @@ void GameOfLifeAudioProcessor::timerCallback()
 //        setTimerIntervall();
 //    }
     
-    DBG("BPM set to: " << _bpm.get());
+    //DBG("BPM set to: " << _bpm.get());
+    
+//    if (_next16thNote.get())
+//    {
+//        _current16thNote.operator++();
+//
+//        if (_current16thNote.get() == 16)
+//        {
+//            _current16thNote = 0;
+//        }
+//
+//        flag = true;
+//    }
+    
+    
+    
+    //DBG("Current 16th note: " << _current16thNote.get());
     
     if (_firstBeatOfBarFlag)
     {
         gameOfLife.doNextStep();
         _firstBeatOfBarFlag = false;
+        flag = true;
     }
-}
-
-void GameOfLifeAudioProcessor::setTimerIntervall()
-{
-    // Calculate timer interval based on BPM
-    double secondsPerBeat = 60.0 / bpm;
-    double secondsPer16thNote = secondsPerBeat / 4.0;
-            
-    // Convert seconds to milliseconds for Timer
-    int timerInterval = static_cast<int>(secondsPer16thNote * 1000.0);
-    
-    startTimer(timerInterval);
 }
 
 //==============================================================================

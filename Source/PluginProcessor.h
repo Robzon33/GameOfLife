@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "game/Board.h"
 #include "synths/SampleSynth/SampleSynth.h"
+#include "mapper/MidiMapper.h"
 
 //==============================================================================
 /**
@@ -66,8 +67,10 @@ private:
     
     juce::Atomic<int> _bpm;
     bool _firstBeatOfBarFlag;
+    juce::Atomic<int> _current16thNote; // value between 0 and 15 (for one bar)
+    juce::Atomic<bool> _next16thNote;
     
-    void setTimerIntervall();
+    MidiMapper midiMapper;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GameOfLifeAudioProcessor)

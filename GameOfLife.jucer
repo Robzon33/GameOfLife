@@ -5,6 +5,9 @@
               pluginCharacteristicsValue="pluginIsSynth">
   <MAINGROUP id="whKrwu" name="GameOfLife">
     <GROUP id="{74480071-A2D1-93F8-9D6C-FE76E36A495C}" name="Source">
+      <GROUP id="{428DBA20-D052-D321-496C-76AB8DD873EE}" name="mapper">
+        <FILE id="x9SIke" name="MidiMapper.h" compile="0" resource="0" file="Source/mapper/MidiMapper.h"/>
+      </GROUP>
       <GROUP id="{6E7DCD9D-F079-49E2-B993-6966781BAD34}" name="resources">
         <FILE id="zvjP4B" name="cello.wav" compile="0" resource="1" file="Source/resources/cello.wav"/>
         <FILE id="d8pcmg" name="closedhh.wav" compile="0" resource="1" file="Source/resources/closedhh.wav"/>
