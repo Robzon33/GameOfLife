@@ -100,7 +100,7 @@ void GameOfLifeAudioProcessor::changeProgramName (int index, const juce::String&
 //==============================================================================
 void GameOfLifeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    synth.setCurrentPlaybackSampleRate(sampleRate);
+    kickSynth.setCurrentPlaybackSampleRate(sampleRate);
     
     // Calculate timer interval based on BPM
     double secondsPerBeat = 60.0 / bpm;
@@ -197,14 +197,32 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     
     if(flag)
     {
-            juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
-            midiMessages.addEvent(noteOn, 0);
+        juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, 0.7f);
+        midiMessages.addEvent(noteOn, 0);
         
+        midiMapper.addMidiMessagesToBuffer(midiMessages);
         
         flag = false;
     }
     
-    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    juce::MidiBuffer filteredMidiMessagesChannel1;
+    juce::MidiBuffer filteredMidiMessagesChannel2;
+
+    // Iterate through the MIDI messages
+    for (const auto metadata : midiMessages)
+    {
+        auto message = metadata.getMessage();
+        if (message.getChannel() == 1)
+        {
+            filteredMidiMessagesChannel1.addEvent(message, metadata.samplePosition);
+        }
+        if (message.getChannel() == 2)
+        {
+            filteredMidiMessagesChannel2.addEvent(message, metadata.samplePosition);
+        }
+    }
+    
+    kickSynth.renderNextBlock(buffer, filteredMidiMessagesChannel1, 0, buffer.getNumSamples());
     
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...

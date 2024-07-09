@@ -62,7 +62,7 @@ public:
     bool getBpmFromDawFlag = false;
 private:
     Board gameOfLife;
-    SampleSynth synth;
+    SampleSynth kickSynth;
     int bpm;
     
     juce::Atomic<int> _bpm;

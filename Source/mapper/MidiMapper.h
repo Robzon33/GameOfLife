@@ -31,10 +31,27 @@ public:
     };
     
     ~MidiMapper() {};
+    
+    void addMidiMessagesToBuffer(juce::MidiBuffer& midiMessages)
+    {
+        for (int row = 0; row < board.getSize(); row++)
+        {
+            for (int col = board.getSize() - 1; col >= 0; col--) // iterating from right to left
+            {
+                if (board.getCellState(col, row) == State::Alive)
+                {
+                    int noteNumber = map[col][row];
+                    juce::MidiMessage noteOn = juce::MidiMessage::noteOn(2, noteNumber, 0.7f);
+                    midiMessages.addEvent(noteOn, 0);
+                    break; // go to next row
+                }
+            }
+        }
+    };
 private:
     void initMapping()
     {
-        int rootNote = 36; // MIDI note number for C1
+        int rootNote = 24; // MIDI note number for C0
         int scale[] = {0, 2, 4, 5, 7, 9, 11}; // Major scale intervals
         int scaleLength = sizeof(scale) / sizeof(scale[0]);
         
