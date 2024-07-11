@@ -100,6 +100,7 @@ void GameOfLifeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     kickSynth.setCurrentPlaybackSampleRate(sampleRate);
     hhSynth.setCurrentPlaybackSampleRate(sampleRate);
+    sinewaveSynth.setCurrentPlaybackSampleRate(sampleRate);
 }
 
 void GameOfLifeAudioProcessor::releaseResources()
@@ -257,6 +258,11 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
                             {
                                 hhMidiMessages.addEvent(noteOn, sample);
                             }
+                            // On every first beat in a bar
+                            if (_current16thStep.get() == 0 && _current16thStep.get() != last16thStep)
+                            {
+                                midiMapper.addMidiMessagesToBuffer(midiMessages);
+                            }
                         }
                     }
                 }
@@ -266,6 +272,9 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     
     kickSynth.renderNextBlock(buffer, kickMidiMessages, 0, buffer.getNumSamples());
     hhSynth.renderNextBlock(buffer, hhMidiMessages, 0, buffer.getNumSamples());
+    
+    // create synth which is using midiMessages to create sound!!!
+    sinewaveSynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
     
     // clear midi messages just in case there is something in there
     midiMessages.clear();

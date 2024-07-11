@@ -34,6 +34,7 @@ public:
     
     void addMidiMessagesToBuffer(juce::MidiBuffer& midiMessages)
     {
+        int counter = 0;
         for (int row = 0; row < board.getSize(); row++)
         {
             for (int col = board.getSize() - 1; col >= 0; col--) // iterating from right to left
@@ -43,10 +44,12 @@ public:
                     int noteNumber = map[col][row];
                     juce::MidiMessage noteOn = juce::MidiMessage::noteOn(2, noteNumber, 0.7f);
                     midiMessages.addEvent(noteOn, 0);
+                    counter++;
                     break; // go to next row
                 }
             }
         }
+        DBG("Number of midi messages added: " << counter);
     };
 private:
     void initMapping()

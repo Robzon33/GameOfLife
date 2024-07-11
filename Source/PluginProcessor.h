@@ -12,6 +12,7 @@
 #include "game/Board.h"
 #include "synths/SampleSynth/SampleSynth.h"
 #include "mapper/MidiMapper.h"
+#include "synths/SinewaveSynth/SinewaveSynth.h"
 
 //==============================================================================
 /**
@@ -62,6 +63,7 @@ private:
     Board gameOfLife;
     SampleSynth kickSynth;
     SampleSynth hhSynth;
+    SinewaveSynth sinewaveSynth;
     
     juce::Atomic<int> _bpm;
     juce::Atomic<double> _ppq;
