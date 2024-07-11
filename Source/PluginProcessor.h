@@ -60,6 +60,7 @@ public:
 
     void timerCallback() override;
     bool flag; // to do next step and update gui
+    juce::Atomic<int> _drumVelocity;
 private:
     Board gameOfLife;
     SampleSynth kickSynth;
@@ -72,7 +73,7 @@ private:
     juce::Atomic<int> _current16thStep; // value between 0 and 15 (for one bar in 4 4 time)
     const int stepsPerBeat = 4;
     const int numSteps = 16;
-    
+        
     /** effects */
     SimpleReverb reverb;
     

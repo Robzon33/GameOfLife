@@ -32,6 +32,12 @@ GameOfLifeAudioProcessorEditor::GameOfLifeAudioProcessorEditor (GameOfLifeAudioP
     generateRandomButton.setButtonText("Fill random");
     generateRandomButton.addListener(this);
     
+    addAndMakeVisible(drumVelocitySlider);
+    drumVelocitySlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    drumVelocitySlider.setRange(0, 127);
+    drumVelocitySlider.setValue(audioProcessor._drumVelocity.get());
+    drumVelocitySlider.addListener(this);
+    
     gameOfLife.addChangeListener(this);
 }
 
@@ -53,9 +59,12 @@ void GameOfLifeAudioProcessorEditor::resized()
     auto b = this->getLocalBounds();
     
     gameComp.setBounds(b.removeFromRight(b.getWidth() / 5 * 4));
+    
     nextStepButton.setBounds(b.removeFromTop(40).reduced(5));
     clearButton.setBounds(b.removeFromTop(40).reduced(5));
     generateRandomButton.setBounds(b.removeFromTop(40).reduced(5));
+    
+    drumVelocitySlider.setBounds(b.removeFromBottom(70).reduced(5));
 }
 
 void GameOfLifeAudioProcessorEditor::buttonClicked(juce::Button* button)
@@ -81,4 +90,13 @@ void GameOfLifeAudioProcessorEditor::buttonClicked(juce::Button* button)
 void GameOfLifeAudioProcessorEditor::changeListenerCallback(juce::ChangeBroadcaster *source)
 {
     this->repaint();
+}
+
+void GameOfLifeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
+{
+    if (slider == &drumVelocitySlider)
+    {
+        int newVelocityValue = (int) drumVelocitySlider.getValue();
+        audioProcessor._drumVelocity = newVelocityValue;
+    }
 }

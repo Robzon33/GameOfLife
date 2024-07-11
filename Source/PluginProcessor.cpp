@@ -27,6 +27,7 @@ GameOfLifeAudioProcessor::GameOfLifeAudioProcessor()
     _current16thStep = 0;
     _bpm = 120;
     startTimer(200);
+    _drumVelocity = 20;
 }
 
 GameOfLifeAudioProcessor::~GameOfLifeAudioProcessor()
@@ -250,7 +251,7 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
                         if (sample == samplePositionInStep)
                         {
                             // Send note-on message
-                            juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, (juce::uint8)60);
+                            juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, (juce::uint8)_drumVelocity.get());
                             noteOn.setTimeStamp(sample);
                             
                             if (kickSynth.playAt16thNote(_current16thStep.get()))
