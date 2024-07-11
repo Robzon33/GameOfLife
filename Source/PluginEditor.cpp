@@ -15,7 +15,8 @@ GameOfLifeAudioProcessorEditor::GameOfLifeAudioProcessorEditor (GameOfLifeAudioP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (800, 600);
+    this->setResizable(true, true);
     
     this->addAndMakeVisible(gameComp);
     
@@ -51,7 +52,7 @@ void GameOfLifeAudioProcessorEditor::resized()
     
     auto b = this->getLocalBounds();
     
-    gameComp.setBounds(b.removeFromRight(300));
+    gameComp.setBounds(b.removeFromRight(b.getWidth() / 5 * 4));
     nextStepButton.setBounds(b.removeFromTop(40).reduced(5));
     clearButton.setBounds(b.removeFromTop(40).reduced(5));
     generateRandomButton.setBounds(b.removeFromTop(40).reduced(5));
