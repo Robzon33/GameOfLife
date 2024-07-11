@@ -22,7 +22,7 @@ GameOfLifeAudioProcessor::GameOfLifeAudioProcessor()
                      #endif
                        ),
 #endif
-    gameOfLife(20), midiMapper(gameOfLife), kickSynth(SampleType::Kick), hhSynth(SampleType::ClosedHH)
+    gameOfLife(20), midiMapper(gameOfLife), kickSynth(SampleType::Kick), hhSynth(SampleType::ClosedHH), openHhSynth(SampleType::OpenHH)
 {
     _current16thStep = 0;
     _bpm = 120;
@@ -100,6 +100,7 @@ void GameOfLifeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     kickSynth.setCurrentPlaybackSampleRate(sampleRate);
     hhSynth.setCurrentPlaybackSampleRate(sampleRate);
+    openHhSynth.setCurrentPlaybackSampleRate(sampleRate);
     sinewaveSynth.setCurrentPlaybackSampleRate(sampleRate);
     reverb.setCurrentPlaybackSampleRate(sampleRate);
 }
@@ -211,6 +212,7 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     
     juce::MidiBuffer kickMidiMessages;
     juce::MidiBuffer hhMidiMessages;
+    juce::MidiBuffer openHhMidiMessages;
     
     if (auto* playHead = getPlayHead())
     {
@@ -259,6 +261,10 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
                             {
                                 hhMidiMessages.addEvent(noteOn, sample);
                             }
+                            if (openHhSynth.playAt16thNote(_current16thStep.get()))
+                            {
+                                openHhMidiMessages.addEvent(noteOn, sample);
+                            }
                             // On every first beat in a bar
                             if (_current16thStep.get() == 0 && _current16thStep.get() != last16thStep)
                             {
@@ -284,6 +290,7 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     
     kickSynth.renderNextBlock(buffer, kickMidiMessages, 0, buffer.getNumSamples());
     hhSynth.renderNextBlock(buffer, hhMidiMessages, 0, buffer.getNumSamples());
+    openHhSynth.renderNextBlock(buffer, openHhMidiMessages, 0, buffer.getNumSamples());
     
     // clear midi messages just in case there is something in there
     midiMessages.clear();

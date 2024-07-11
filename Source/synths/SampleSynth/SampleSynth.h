@@ -14,7 +14,7 @@
 #include "SampleSound.h"
 #include "SampleVoice.h"
 
-enum class SampleType { Kick, ClosedHH};
+enum class SampleType { Kick, ClosedHH, OpenHH };
 
 class SampleSynth : public juce::Synthesiser
 {
@@ -34,15 +34,21 @@ public:
         // Use BinaryData to get the WAV file
         if (sampleType == SampleType::Kick)
         {
-            waveFile = BinaryData::kick_wav;
-            waveFileSize = BinaryData::kick_wavSize;
+            waveFile = BinaryData::cymaticskick12_wav;
+            waveFileSize = BinaryData::cymaticskick12_wavSize;
             this->createRhythmArray();
         }
         else if (sampleType == SampleType::ClosedHH)
         {
-            waveFile = BinaryData::closedhh_wav;
-            waveFileSize = BinaryData::closedhh_wavSize;
+            waveFile = BinaryData::CymaticsClosedHihat9_wav;
+            waveFileSize = BinaryData::CymaticsClosedHihat9_wavSize;
             this->createRhythmArray2();
+        }
+        else if (sampleType == SampleType::OpenHH)
+        {
+            waveFile = BinaryData::CymaticsOpenHihat_wav;
+            waveFileSize = BinaryData::CymaticsOpenHihat_wavSize;
+            this->createRhythmArray3();
         }
         
         std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(std::make_unique<juce::MemoryInputStream>(waveFile, waveFileSize, false)));
@@ -89,11 +95,15 @@ private:
     void createRhythmArray2()
     {
         rhythmArray.fill(false);
-        
         rhythmArray[2] = true;
-        rhythmArray[6] = true;
-        rhythmArray[10] = true;
+        rhythmArray[7] = true;
         rhythmArray[14] = true;
+    };
+    
+    void createRhythmArray3()
+    {
+        rhythmArray.fill(false);
+        rhythmArray[13] = true;
     };
     
     juce::SamplerSound::Ptr sampleSound;

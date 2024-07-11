@@ -64,6 +64,7 @@ private:
     Board gameOfLife;
     SampleSynth kickSynth;
     SampleSynth hhSynth;
+    SampleSynth openHhSynth;
     SinewaveSynth sinewaveSynth;
     
     juce::Atomic<int> _bpm;
