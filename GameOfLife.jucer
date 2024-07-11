@@ -14,6 +14,12 @@
       <GROUP id="{6E7DCD9D-F079-49E2-B993-6966781BAD34}" name="resources">
         <FILE id="zvjP4B" name="cello.wav" compile="0" resource="1" file="Source/resources/cello.wav"/>
         <FILE id="d8pcmg" name="closedhh.wav" compile="0" resource="1" file="Source/resources/closedhh.wav"/>
+        <FILE id="RnxTzw" name="CymaticsClosedHihat9.wav" compile="0" resource="1"
+              file="Source/resources/CymaticsClosedHihat9.wav"/>
+        <FILE id="mXT5AX" name="cymaticskick12.wav" compile="0" resource="1"
+              file="Source/resources/cymaticskick12.wav"/>
+        <FILE id="dQ4go4" name="CymaticsOpenHihat.wav" compile="0" resource="1"
+              file="Source/resources/CymaticsOpenHihat.wav"/>
         <FILE id="PUkwBN" name="kick.wav" compile="0" resource="1" file="Source/resources/kick.wav"/>
       </GROUP>
       <GROUP id="{D582A9A7-88A0-37B4-A054-126033099876}" name="synths">
