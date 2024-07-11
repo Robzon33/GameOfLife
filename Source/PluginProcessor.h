@@ -13,6 +13,7 @@
 #include "synths/SampleSynth/SampleSynth.h"
 #include "mapper/MidiMapper.h"
 #include "synths/SinewaveSynth/SinewaveSynth.h"
+#include "effects/SimpleReverb.h"
 
 //==============================================================================
 /**
@@ -70,6 +71,9 @@ private:
     juce::Atomic<int> _current16thStep; // value between 0 and 15 (for one bar in 4 4 time)
     const int stepsPerBeat = 4;
     const int numSteps = 16;
+    
+    /** effects */
+    SimpleReverb reverb;
     
     MidiMapper midiMapper;
     

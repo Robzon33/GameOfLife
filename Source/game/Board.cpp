@@ -124,10 +124,23 @@ void Board::changeState(int x, int y)
     }
 }
 
+void Board::clear()
+{
+    int boardSize = (int) cells.size();
+    
+    for (int x = 0; x < boardSize; ++x)
+    {
+        for (int y = 0; y < boardSize; ++y)
+        {
+            cells[x][y].setState(State::Dead);
+        }
+    }
+}
+
 int Board::getNumberOfNeighbours(int x, int y)
 {
     int numNeighbours = 0;
-    int boardSize = (int) cells.size(); // Assuming the board is square
+    int boardSize = (int) cells.size();
 
     // Define offsets for neighboring cells
     int dx[] = { -1, -1, -1, 0, 0, 1, 1, 1 };

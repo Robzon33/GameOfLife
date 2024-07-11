@@ -35,14 +35,14 @@ public:
     void addMidiMessagesToBuffer(juce::MidiBuffer& midiMessages)
     {
         int counter = 0;
-        for (int row = 0; row < board.getSize(); row++)
+        for (int y = 0; y < board.getSize(); y++)
         {
-            for (int col = board.getSize() - 1; col >= 0; col--) // iterating from right to left
+            for (int x = board.getSize() - 1; x >= 0; x--) // iterating from right to left
             {
-                if (board.getCellState(col, row) == State::Alive)
+                if (board.getCellState(x, y) == State::Alive)
                 {
-                    int noteNumber = map[col][row];
-                    juce::MidiMessage noteOn = juce::MidiMessage::noteOn(2, noteNumber, 0.7f);
+                    int noteNumber = map[x][y];
+                    juce::MidiMessage noteOn = juce::MidiMessage::noteOn(2, noteNumber, 0.2f);
                     midiMessages.addEvent(noteOn, 0);
                     counter++;
                     break; // go to next row
@@ -60,25 +60,25 @@ private:
         
         int boardSize = board.getSize();
         
-        for (int row = 0; row < boardSize; ++row)
+        for (int y = 0; y < boardSize; ++y)
         {
-            for (int col = 0; col < boardSize; ++col)
+            for (int x = 0; x < boardSize; ++x)
             {
-                int scaleOffset = row * 2; // Every new row starts from the next scale degree
-                int note = rootNote + scale[(col + scaleOffset) % scaleLength] + 12 * ((col + scaleOffset) / scaleLength);
-                map[row][col] = note;
+                int scaleOffset = y * 2; // Every new row starts from the next scale degree
+                int note = rootNote + scale[(x + scaleOffset) % scaleLength] + 12 * ((x + scaleOffset) / scaleLength);
+                map[x][y] = note;
             }
         }
     };
     
     void printMap() const
     {
-        for (int row = 0; row < map.size(); ++row)
+        for (int y = 0; y < map.size(); ++y)
         {
-            juce::String rowString = "Row " + juce::String(row) + ": ";
-            for (int col = 0; col < map[row].size(); ++col)
+            juce::String rowString = "Row " + juce::String(y) + ": ";
+            for (int x = 0; x < map[y].size(); ++x)
             {
-                rowString += "(" + juce::String(row) + "," + juce::String(col) + ":" + juce::String(map[row][col]) + ") ";
+                rowString += "(" + juce::String(x) + "," + juce::String(y) + ":" + juce::String(map[x][y]) + ") ";
             }
             DBG(rowString.trimEnd());
         }

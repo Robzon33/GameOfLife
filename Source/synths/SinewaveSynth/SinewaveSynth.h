@@ -45,6 +45,8 @@ public:
         tailOff = 0.0;
         
         auto cyclesPerSecond = juce::MidiMessage::getMidiNoteInHertz (midiNoteNumber);
+        DBG("Midi Note started: " << midiNoteNumber);
+        
         auto cyclesPerSample = cyclesPerSecond / getSampleRate();
         
         angleDelta = cyclesPerSample * 2.0 * juce::MathConstants<double>::pi;
@@ -102,7 +104,7 @@ public:
             {
                 while (--numSamples >= 0)
                 {
-                    auto currentSample = (float) (std::sin (currentAngle) * level);
+                    auto currentSample = (float) (std::sin (currentAngle) * level * normalizationFactor);
                     
                     for (auto i = outputBuffer.getNumChannels(); --i >= 0;)
                         outputBuffer.addSample (i, startSample, currentSample);

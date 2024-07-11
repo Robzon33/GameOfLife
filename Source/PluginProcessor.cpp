@@ -101,6 +101,7 @@ void GameOfLifeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     kickSynth.setCurrentPlaybackSampleRate(sampleRate);
     hhSynth.setCurrentPlaybackSampleRate(sampleRate);
     sinewaveSynth.setCurrentPlaybackSampleRate(sampleRate);
+    reverb.setCurrentPlaybackSampleRate(sampleRate);
 }
 
 void GameOfLifeAudioProcessor::releaseResources()
@@ -247,7 +248,7 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
                         if (sample == samplePositionInStep)
                         {
                             // Send note-on message
-                            juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, (juce::uint8)127);
+                            juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 60, (juce::uint8)60);
                             noteOn.setTimeStamp(sample);
                             
                             if (kickSynth.playAt16thNote(_current16thStep.get()))
@@ -261,20 +262,28 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
                             // On every first beat in a bar
                             if (_current16thStep.get() == 0 && _current16thStep.get() != last16thStep)
                             {
+                                sinewaveSynth.allNotesOff(2, true);
                                 midiMapper.addMidiMessagesToBuffer(midiMessages);
                             }
                         }
                     }
                 }
             }
+            else // if not playing
+            {
+                sinewaveSynth.allNotesOff(2, true);
+            }
         }
     }
     
-    kickSynth.renderNextBlock(buffer, kickMidiMessages, 0, buffer.getNumSamples());
-    hhSynth.renderNextBlock(buffer, hhMidiMessages, 0, buffer.getNumSamples());
-    
     // create synth which is using midiMessages to create sound!!!
     sinewaveSynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    
+    // add effect only to sinewave synth sound
+    reverb.process(buffer, buffer.getNumSamples());
+    
+    //kickSynth.renderNextBlock(buffer, kickMidiMessages, 0, buffer.getNumSamples());
+    //hhSynth.renderNextBlock(buffer, hhMidiMessages, 0, buffer.getNumSamples());
     
     // clear midi messages just in case there is something in there
     midiMessages.clear();

@@ -23,6 +23,10 @@ GameOfLifeAudioProcessorEditor::GameOfLifeAudioProcessorEditor (GameOfLifeAudioP
     nextStepButton.setButtonText("Next Step");
     nextStepButton.addListener(this);
     
+    addAndMakeVisible(clearButton);
+    clearButton.setButtonText("Clear Board");
+    clearButton.addListener(this);
+    
     gameOfLife.addChangeListener(this);
 }
 
@@ -44,7 +48,8 @@ void GameOfLifeAudioProcessorEditor::resized()
     auto b = this->getLocalBounds();
     
     gameComp.setBounds(b.removeFromRight(300));
-    nextStepButton.setBounds(b.removeFromTop(20).reduced(5));
+    nextStepButton.setBounds(b.removeFromTop(40).reduced(5));
+    clearButton.setBounds(b.removeFromTop(40).reduced(5));
 }
 
 void GameOfLifeAudioProcessorEditor::buttonClicked(juce::Button* button)
@@ -54,6 +59,11 @@ void GameOfLifeAudioProcessorEditor::buttonClicked(juce::Button* button)
         gameOfLife.doNextStep(); // Call the method to perform the next step
         repaint(); // Update the display after the step
         audioProcessor.flag = true;
+    }
+    if (button ==&clearButton)
+    {
+        gameOfLife.clear();
+        repaint();
     }
 }
 
