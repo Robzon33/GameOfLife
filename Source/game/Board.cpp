@@ -18,8 +18,6 @@ Board::Board(int size)
     {
         cells[i].resize(size);
     }
-    
-    this->generateRandom();
 }
 
 Board::~Board()

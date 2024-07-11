@@ -41,6 +41,7 @@ private:
     
     juce::TextButton nextStepButton;
     juce::TextButton clearButton;
+    juce::TextButton generateRandomButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GameOfLifeAudioProcessorEditor)
 };

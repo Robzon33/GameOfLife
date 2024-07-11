@@ -27,6 +27,10 @@ GameOfLifeAudioProcessorEditor::GameOfLifeAudioProcessorEditor (GameOfLifeAudioP
     clearButton.setButtonText("Clear Board");
     clearButton.addListener(this);
     
+    addAndMakeVisible(generateRandomButton);
+    generateRandomButton.setButtonText("Fill random");
+    generateRandomButton.addListener(this);
+    
     gameOfLife.addChangeListener(this);
 }
 
@@ -50,6 +54,7 @@ void GameOfLifeAudioProcessorEditor::resized()
     gameComp.setBounds(b.removeFromRight(300));
     nextStepButton.setBounds(b.removeFromTop(40).reduced(5));
     clearButton.setBounds(b.removeFromTop(40).reduced(5));
+    generateRandomButton.setBounds(b.removeFromTop(40).reduced(5));
 }
 
 void GameOfLifeAudioProcessorEditor::buttonClicked(juce::Button* button)
@@ -63,6 +68,11 @@ void GameOfLifeAudioProcessorEditor::buttonClicked(juce::Button* button)
     if (button ==&clearButton)
     {
         gameOfLife.clear();
+        repaint();
+    }
+    if (button == &generateRandomButton)
+    {
+        gameOfLife.generateRandom();
         repaint();
     }
 }
