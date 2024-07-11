@@ -282,8 +282,8 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     // add effect only to sinewave synth sound
     reverb.process(buffer, buffer.getNumSamples());
     
-    //kickSynth.renderNextBlock(buffer, kickMidiMessages, 0, buffer.getNumSamples());
-    //hhSynth.renderNextBlock(buffer, hhMidiMessages, 0, buffer.getNumSamples());
+    kickSynth.renderNextBlock(buffer, kickMidiMessages, 0, buffer.getNumSamples());
+    hhSynth.renderNextBlock(buffer, hhMidiMessages, 0, buffer.getNumSamples());
     
     // clear midi messages just in case there is something in there
     midiMessages.clear();

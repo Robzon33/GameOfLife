@@ -15,9 +15,7 @@
 GameComponent::GameComponent(Board& b)
     : gameOfLife(b)
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-
+    startTimer(50);
 }
 
 GameComponent::~GameComponent()
@@ -63,7 +61,7 @@ void GameComponent::paint(juce::Graphics& g)
         }
     }
     
-    hue += .05f;
+    hue += .005f;
     if (hue > 1.f)
     {
         hue -= 1.f;
@@ -96,4 +94,9 @@ void GameComponent::mouseDown(const juce::MouseEvent& event)
         
         repaint(); // Repaint the component to update the display
     }
+}
+
+void GameComponent::timerCallback()
+{
+    this->repaint();
 }

@@ -16,7 +16,7 @@
 //==============================================================================
 /*
 */
-class GameComponent  : public juce::Component
+class GameComponent  : public juce::Component, public juce::Timer
 {
 public:
     GameComponent(Board&);
@@ -26,6 +26,7 @@ public:
     void resized() override;
     
     void mouseDown(const juce::MouseEvent& event) override;
+    void timerCallback() override;
 private:
     Board& gameOfLife;
     
