@@ -26,7 +26,8 @@ public:
             map[i].resize(board.getSize());
         }
         
-        this->initMapping();
+        //this->initDiatonicMapping();
+        this->initChromaticMapping();
         this->printMap();
     };
     
@@ -51,8 +52,8 @@ public:
         }
         DBG("Number of midi messages added: " << counter);
     };
-private:
-    void initMapping()
+    
+    void initDiatonicMapping()
     {
         int rootNote = 24; // MIDI note number for C0
         int scale[] = {0, 2, 4, 5, 7, 9, 11}; // Major scale intervals
@@ -71,6 +72,22 @@ private:
         }
     };
     
+    void initChromaticMapping()
+    {
+        int rootNote = 24; // MIDI note number for C0
+        
+        int boardSize = board.getSize();
+        
+        for (int y = 0; y < boardSize; ++y)
+        {
+            int note = rootNote + (y * 3);
+            for (int x = 0; x < boardSize; ++x)
+            {
+                map[x][y] = note + x;
+            }
+        }
+    };
+private:
     void printMap() const
     {
         for (int y = 0; y < map.size(); ++y)

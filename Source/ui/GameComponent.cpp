@@ -12,8 +12,8 @@
 #include "GameComponent.h"
 
 //==============================================================================
-GameComponent::GameComponent(Board& b)
-    : gameOfLife(b)
+GameComponent::GameComponent(Board& b, MidiMapper& mm)
+    : gameOfLife(b), midiMapper(mm)
 {
     startTimer(50);
 }

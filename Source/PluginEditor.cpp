@@ -10,8 +10,8 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-GameOfLifeAudioProcessorEditor::GameOfLifeAudioProcessorEditor (GameOfLifeAudioProcessor& p, Board& b)
-    : AudioProcessorEditor (&p), audioProcessor (p), gameComp(b), gameOfLife(b)
+GameOfLifeAudioProcessorEditor::GameOfLifeAudioProcessorEditor (GameOfLifeAudioProcessor& p, Board& b, MidiMapper& mm)
+    : AudioProcessorEditor (&p), audioProcessor (p), gameComp(b, mm), gameOfLife(b), midiMapper(mm)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -31,6 +31,14 @@ GameOfLifeAudioProcessorEditor::GameOfLifeAudioProcessorEditor (GameOfLifeAudioP
     addAndMakeVisible(generateRandomButton);
     generateRandomButton.setButtonText("Fill random");
     generateRandomButton.addListener(this);
+    
+    addAndMakeVisible(setDiatonicMappingButton);
+    setDiatonicMappingButton.setButtonText("Diatonic Mapping");
+    setDiatonicMappingButton.addListener(this);
+    
+    addAndMakeVisible(setChromaticMappingButton);
+    setChromaticMappingButton.setButtonText("Chromatic Mapping");
+    setChromaticMappingButton.addListener(this);
     
     addAndMakeVisible(drumVelocitySlider);
     drumVelocitySlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
@@ -63,6 +71,8 @@ void GameOfLifeAudioProcessorEditor::resized()
     nextStepButton.setBounds(b.removeFromTop(40).reduced(5));
     clearButton.setBounds(b.removeFromTop(40).reduced(5));
     generateRandomButton.setBounds(b.removeFromTop(40).reduced(5));
+    setDiatonicMappingButton.setBounds(b.removeFromTop(40).reduced(5));
+    setChromaticMappingButton.setBounds(b.removeFromTop(40).reduced(5));
     
     drumVelocitySlider.setBounds(b.removeFromBottom(70).reduced(5));
 }
@@ -72,10 +82,8 @@ void GameOfLifeAudioProcessorEditor::buttonClicked(juce::Button* button)
     if (button == &nextStepButton)
     {
         gameOfLife.doNextStep(); // Call the method to perform the next step
-        repaint(); // Update the display after the step
-        audioProcessor.flag = true;
     }
-    if (button ==&clearButton)
+    if (button == &clearButton)
     {
         gameOfLife.clear();
         repaint();
@@ -84,6 +92,14 @@ void GameOfLifeAudioProcessorEditor::buttonClicked(juce::Button* button)
     {
         gameOfLife.generateRandom();
         repaint();
+    }
+    if (button == &setDiatonicMappingButton)
+    {
+        midiMapper.initDiatonicMapping();
+    }
+    if (button == &setChromaticMappingButton)
+    {
+        midiMapper.initChromaticMapping();
     }
 }
 

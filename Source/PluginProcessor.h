@@ -18,7 +18,7 @@
 //==============================================================================
 /**
 */
-class GameOfLifeAudioProcessor  : public juce::AudioProcessor, juce::Timer
+class GameOfLifeAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
@@ -58,8 +58,6 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void timerCallback() override;
-    bool flag; // to do next step and update gui
     juce::Atomic<int> _drumVelocity;
 private:
     Board gameOfLife;

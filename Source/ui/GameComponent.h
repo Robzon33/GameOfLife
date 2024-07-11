@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h>
 #include "../game/Board.h"
+#include "../mapper/MidiMapper.h"
 
 //==============================================================================
 /*
@@ -19,7 +20,7 @@
 class GameComponent  : public juce::Component, public juce::Timer
 {
 public:
-    GameComponent(Board&);
+    GameComponent(Board&, MidiMapper&);
     ~GameComponent() override;
 
     void paint (juce::Graphics&) override;
@@ -29,6 +30,7 @@ public:
     void timerCallback() override;
 private:
     Board& gameOfLife;
+    MidiMapper& midiMapper;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GameComponent)
 };

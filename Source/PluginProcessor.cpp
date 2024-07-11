@@ -26,7 +26,6 @@ GameOfLifeAudioProcessor::GameOfLifeAudioProcessor()
 {
     _current16thStep = 0;
     _bpm = 120;
-    startTimer(200);
     _drumVelocity = 20;
 }
 
@@ -240,7 +239,8 @@ void GameOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
                     
                     if (_current16thStep.get() == 0 && _current16thStep.get() != last16thStep)
                     {
-                        flag = true;
+                        //flag = true;
+                        gameOfLife.doNextStep();
                     }
                     
                     const int samplePositionInStep = static_cast<int>((_ppq.get() * stepsPerBeat) * samplesPerStep) % static_cast<int>(samplesPerStep);
@@ -305,7 +305,7 @@ bool GameOfLifeAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* GameOfLifeAudioProcessor::createEditor()
 {
-    return new GameOfLifeAudioProcessorEditor (*this, gameOfLife);
+    return new GameOfLifeAudioProcessorEditor (*this, gameOfLife, midiMapper);
 }
 
 //==============================================================================
@@ -320,15 +320,6 @@ void GameOfLifeAudioProcessor::setStateInformation (const void* data, int sizeIn
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
-}
-
-void GameOfLifeAudioProcessor::timerCallback()
-{
-    if (flag)
-    {
-        gameOfLife.doNextStep();
-        flag = false;
-    }
 }
 
 //==============================================================================

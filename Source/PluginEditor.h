@@ -22,7 +22,7 @@ class GameOfLifeAudioProcessorEditor  : public juce::AudioProcessorEditor,
 public juce::Slider::Listener
 {
 public:
-    GameOfLifeAudioProcessorEditor (GameOfLifeAudioProcessor&, Board&);
+    GameOfLifeAudioProcessorEditor (GameOfLifeAudioProcessor&, Board&, MidiMapper&);
     ~GameOfLifeAudioProcessorEditor() override;
 
     //==============================================================================
@@ -41,10 +41,13 @@ private:
     
     GameComponent gameComp;
     Board& gameOfLife;
+    MidiMapper& midiMapper;
     
     juce::TextButton nextStepButton;
     juce::TextButton clearButton;
     juce::TextButton generateRandomButton;
+    juce::TextButton setDiatonicMappingButton;
+    juce::TextButton setChromaticMappingButton;
     
     juce::Slider drumVelocitySlider;
 
