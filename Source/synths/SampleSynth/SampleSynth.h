@@ -87,9 +87,9 @@ private:
         rhythmArray.fill(false);
         
         rhythmArray[0] = true;
-        rhythmArray[4] = true;
+        //rhythmArray[4] = true;
         rhythmArray[8] = true;
-        rhythmArray[12] = true;
+        //rhythmArray[12] = true;
     };
     
     void createRhythmArray2()
