@@ -27,9 +27,7 @@
           <FILE id="LuCGVY" name="SinewaveSynth.h" compile="0" resource="0" file="Source/synths/SinewaveSynth/SinewaveSynth.h"/>
         </GROUP>
         <GROUP id="{E8CC9C0E-AFED-3A7C-EB01-26890C2E80DE}" name="sampleSynth">
-          <FILE id="GSGh6R" name="SampleSound.h" compile="0" resource="0" file="Source/synths/SampleSynth/SampleSound.h"/>
           <FILE id="Sr08dQ" name="SampleSynth.h" compile="0" resource="0" file="Source/synths/SampleSynth/SampleSynth.h"/>
-          <FILE id="sUhtB2" name="SampleVoice.h" compile="0" resource="0" file="Source/synths/SampleSynth/SampleVoice.h"/>
         </GROUP>
       </GROUP>
       <GROUP id="{715CD5C7-D0FC-9E47-E2D4-DED1631795D2}" name="game">
